@@ -18,6 +18,12 @@ resource "google_container_cluster" "primary" {
       issue_client_certificate = false
     }
   }
+  addons_config {
+    istio_config {
+      disabled = false
+      auth = "AUTH_MUTUAL_TLS"
+    }
+  }
 }
 
 # Separately Managed Node Pool
