@@ -1,10 +1,10 @@
 project_id = "architect-certification-289902"
-tfstate_gcs_backend = "architect-certification-289902-42-tfstate"
+tfstate_gcs_backend = "architect-certification-289902-43-tfstate"
 region = "us-west3"
 zones = ["us-west3-a"]
 ip_range_pods_name = "ip-range-pods"
 ip_range_services_name = "ip-range-scv"
-network_name = "jenkins-network-42"
+network_name = "jenkins-network-43"
 subnet_ip = "10.10.10.0/24"
-subnet_name = "jenkins-subnet-42"
+subnet_name = "jenkins-subnet-43"
 jenkins_k8s_config = "jenkins-k8s-config"

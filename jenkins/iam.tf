@@ -16,7 +16,7 @@ module "workload_identity" {
   source              = "terraform-google-modules/kubernetes-engine/google//modules/workload-identity"
   version             = "~> 7.0"
   project_id          = module.enables-google-apis.project_id
-  name                = "jenkins-wi-${module.jenkins-gke.name}-42"
+  name                = "jenkins-wi-${module.jenkins-gke.name}-43"
   namespace           = "default"
   use_existing_k8s_sa = false
 }
