@@ -25,6 +25,7 @@ module "jenkins-gke" {
       min_count    = 1
       max_count    = 3
       auto_upgrade = true
+      machine_type = "n1-standard-4"
     }
   ]
 }
