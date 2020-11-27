@@ -65,9 +65,11 @@ module "gke_auth" {
 }
  
 resource "kubernetes_namespace" "default" {
-      metadata {
+    metadata {
         annotations      = {}
-        labels           = {}
+        labels           = {
+          istio-injection = "enabled"
+        }
         name             = "default"
     }
 }
