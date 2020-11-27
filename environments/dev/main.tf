@@ -33,4 +33,4 @@ provider "helm" {
     host                   = google_container_cluster.primary.endpoint
     token                  = data.google_client_config.default.access_token
   }
-}
+} 
