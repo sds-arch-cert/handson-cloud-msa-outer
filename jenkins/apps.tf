@@ -22,6 +22,6 @@ resource "helm_release" "argo-cd" {
   chart      = "argo-cd"
   version    = "2.9.5"
   timeout    = 1200
- 
+
   values     = [data.local_file.argo_cd_values.content]
 }
