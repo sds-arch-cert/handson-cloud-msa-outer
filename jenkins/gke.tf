@@ -5,7 +5,7 @@ module "jenkins-gke" {
   source                   = "terraform-google-modules/kubernetes-engine/google//modules/beta-public-cluster/"
   version                  = "~> 7.0"
   project_id               = module.enables-google-apis.project_id
-  name                     = "jenkins"
+  name                     = "jenkins-43"
   regional                 = false
   region                   = var.region
   zones                    = var.zones
@@ -25,6 +25,7 @@ module "jenkins-gke" {
       min_count    = 1
       max_count    = 3
       auto_upgrade = true
+      machine_type = "n1-standard-4"
     }
   ]
 }
