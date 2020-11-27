@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: eshop-frontend
-          image: gcr.io/architect-certification-289902/{본인의 MEMBER ID}/eshop-frontend:{기존 버전 태그}
+          image: gcr.io/architect-certification-289902/25/eshop-frontend:1
           ports:
           - containerPort: 8080
           resources:
@@ -43,13 +43,13 @@ spec:
     spec:
       containers:
         - name: eshop-frontend
-          image: gcr.io/architect-certification-289902/{본인의 MEMBER ID}/eshop-frontend:{신규 버전 태그}
+          image: gcr.io/architect-certification-289902/25/eshop-frontend:2
           ports:
           - containerPort: 8080
           resources:
             requests:
               cpu: 100m
-              memory: 64Mi
+              memory: 64Mig
             limits:
               cpu: 200m
               memory: 128Mi
