@@ -1,7 +1,7 @@
 variable "environment" {
   type        = string
   description = "Name of the environment (dev or prod)"
-  default     = "dev"
+  default     = "prd"
 }
 
 variable "project_id" {
