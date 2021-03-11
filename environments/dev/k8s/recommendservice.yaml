@@ -14,7 +14,7 @@ spec:
       terminationGracePeriodSeconds: 5
       containers:
       - name: eshop-recommendservice
-        image: gcr.io/architect-certification-289902/35/eshop-recommendservice
+        image: gcr.io/architect-certification-289902/35/eshop-recommendservice:2
         ports:
         - containerPort: 8093
         env:
