@@ -54,3 +54,4 @@ resource "kubernetes_namespace" "eshop-dev" {
     name = "eshop-dev"
   }
 }
+
