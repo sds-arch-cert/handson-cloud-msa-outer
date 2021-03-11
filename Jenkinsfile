@@ -1,113 +1,103 @@
-/**
- * Copyright 2020 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-pipeline {
-  agent {
-      label "terraform-exec"
-  }
-  stages {
-    // [START tf-init, tf-validate]
-    stage('TF init & validate') {
-      when { anyOf {branch "dev";changeRequest() } }
-      steps {
-        container('terraform') {
-          sh '''
-          if [[ $CHANGE_TARGET ]]; then
-            TARGET_ENV=$CHANGE_TARGET
-          else
-            TARGET_ENV=$BRANCH_NAME
-          fi
-
-          if [ -d "environments/${TARGET_ENV}/" ]; then
-            cd environments/${TARGET_ENV}
-            terraform init
-            terraform validate
-          else
-            for dir in environments/*/
-            do 
-              cd ${dir}
-              env=${dir%*/}
-              env=${env#*/}
-              echo ""
-              echo "*************** TERRAFOM INIT and VALIDATE ******************"
-              echo "******* At environment: ${env} ********"
-              echo "*************************************************"
-              terraform init || exit 1
-              terraform validate || exit 1
-              cd ../../../
-            done
-          fi'''
-        }
-      }
-    }
-    // [END tf-init, tf-validate]
-
-    // [START tf-plan]
-    stage('TF plan') {
-      when { anyOf {branch "dev";changeRequest() } }
-      steps {
-        container('terraform') {
-          sh '''
-          if [[ $CHANGE_TARGET ]]; then
-            TARGET_ENV=$CHANGE_TARGET
-          else
-            TARGET_ENV=$BRANCH_NAME
-          fi
-         
-          if [ -d "environments/${TARGET_ENV}/" ]; then
-            cd environments/${TARGET_ENV}
-            terraform plan
-          else
-            for dir in environments/*/
-            do 
-              cd ${dir}
-              env=${dir%*/}
-              env=${env#*/}
-              echo ""
-              echo "*************** TERRAFOM PLAN ******************"
-              echo "******* At environment: ${env} ********"
-              echo "*************************************************"
-              terraform plan || exit 1
-              cd ../../../
-            done
-          fi'''
-        }
-      }
-    }
-    // [END tf-plan]
-
-    // [START tf-apply]
-    stage('TF Apply') {
-      when { anyOf {branch "dev" } }
-      steps {
-        container('terraform') {
-          sh '''
-          TARGET_ENV=$BRANCH_NAME
-
-          if [ -d "environments/${TARGET_ENV}/" ]; then
-            cd environments/${TARGET_ENV}
-            terraform apply -input=false -auto-approve
-          else
-            echo "*************** SKIPPING APPLY ******************"
-            echo "Branch '$TARGET_ENV' does not represent an official environment."
-            echo "*************************************************"
-          fi'''
-        }
-      }
-    }
-    // [END tf-apply]
-  }
-}
+# Copyright 2020 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+ 
+master:
+  tag: "2.281"
+  containerEnv:
+    - name: PROJECT_ID
+      valueFrom:
+        secretKeyRef:
+            name: jenkins-k8s-config
+            key: project_id
+    - name: jenkins_tf_ksa
+      valueFrom:
+        secretKeyRef:
+            name: jenkins-k8s-config
+            key: jenkins_tf_ksa
+  servicePort: 80
+  serviceType: LoadBalancer
+  installPlugins:
+    - kubernetes:1.29.1
+    - workflow-job:2.40
+    - workflow-aggregator:2.6
+    - credentials-binding:1.24
+    - git:4.6.0
+    - blueocean:1.24.3
+    - docker-custom-build-environment:1.7.3
+    - credentials:2.3.15
+    - docker-commons:1.17
+    - docker-workflow:1.26
+    - job-dsl:1.77
+    - configuration-as-code:1.47
+    - jdk-tool:1.5
+  JCasC:
+    enabled: true
+    configScripts:
+        cloud: |
+            jenkins:
+                clouds:
+                    - kubernetes:
+                        name: "gke-executors"
+                        serverUrl: "https://kubernetes.default"
+                        jenkinsTunnel: "jenkins-agent:50000"
+                        jenkinsUrl: "http://jenkins:80"
+                        skipTlsVerify: true
+                        namespace: "default"
+                        templates:
+                            - name: "jenkins-jnlp"
+                              namespace: "default"
+                              nodeUsageMode: NORMAL
+                              label: "jnlp-exec"
+                              containers:
+                                - name: "jnlp"
+                                  image: "jenkins/jnlp-slave"
+                                  alwaysPullImage: false
+                                  workingDir: "/home/jenkins/agent"
+                                  ttyEnabled: true
+                                  command: ""
+                                  args: ""
+                                  resourceRequestCpu: "500m"
+                                  resourceLimitCpu: "1000m"
+                                  resourceRequestMemory: "1Gi"
+                                  resourceLimitMemory: "2Gi"
+                              volumes:
+                                - emptyDirVolume:
+                                    memory: false
+                                    mountPath: "/tmp"
+                              idleMinutes: "1"
+                              activeDeadlineSeconds: "120"
+                              slaveConnectTimeout: "1000"
+                            - name: "terraform"
+                              namespace: "default"
+                              nodeUsageMode: NORMAL
+                              serviceAccount: ${jenkins_tf_ksa}
+                              label: "terraform-exec"
+                              containers:
+                                - name: "terraform"
+                                  image: "hashicorp/terraform:0.12.24"
+                                  alwaysPullImage: false
+                                  workingDir: "/home/jenkins/agent"
+                                  ttyEnabled: true
+                                  command: "/bin/sh -c"
+                                  args: "cat"
+                                  resourceRequestCpu: "1000m"
+                                  resourceLimitCpu: "4000m"
+                                  resourceRequestMemory: "2Gi"
+                                  resourceLimitMemory: "8Gi"
+                              volumes:
+                                - emptyDirVolume:
+                                    memory: false
+                                    mountPath: "/tmp"
+                              podRetention: "never"
+                              activeDeadlineSeconds: "500"
