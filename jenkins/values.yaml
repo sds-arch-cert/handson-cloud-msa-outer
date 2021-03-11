@@ -91,10 +91,10 @@ master:
                                   ttyEnabled: true
                                   command: "/bin/sh -c"
                                   args: "cat"
-                                  resourceRequestCpu: "500m"
-                                  resourceLimitCpu: "1000m"
-                                  resourceRequestMemory: "1Gi"
-                                  resourceLimitMemory: "2Gi"
+                                  resourceRequestCpu: "1000m"
+                                  resourceLimitCpu: "4000m"
+                                  resourceRequestMemory: "2Gi"
+                                  resourceLimitMemory: "8Gi"
                               volumes:
                                 - emptyDirVolume:
                                     memory: false
