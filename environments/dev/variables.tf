@@ -5,21 +5,21 @@ variable "environment" {
 }
 
 variable "project_id" {
-  description = "project id"
+  description = "architect-certification-289902"
 }
 
 variable "member_id" {
-  description = "member id"
+  description = "26"
 }
 
 variable "region" {
   description = "region"
-  default = "us-central1"
+  default = "asia-southeast1"
 }
 
 variable "zones" {
   description = "zones"
-  default = ["us-central1-a"]
+  default = ["asia-southeast1-a"]
 }
 
 variable "subnet_cidr" {
